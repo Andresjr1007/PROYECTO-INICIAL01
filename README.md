@@ -2,7 +2,7 @@
 
 Sistema web de atención al cliente desarrollado como proyecto académico.
 
-## 📚 Ciclo de Vida del Software (Fases)
+##  Ciclo de Vida del Software (Fases)
 
 **Fase 00 - Ingeniería de Requerimientos:**
 * [ERS - Especificación de Requerimientos](docs/requerimientos/ERS.md)
@@ -26,9 +26,9 @@ Sistema web de atención al cliente desarrollado como proyecto académico.
 **Fase 05 - Implementación:**
 * [Guía de Implementación](docs/implementacion/Implementacion_Guia.md)
 
-## 🚀 Ejecución del Proyecto
+## Ejecución del Proyecto
 * Para ejecutar el portal, usa el archivo `run.ps1` en Windows.
 * Requisitos: Python instalado. Para instalar dependencias, ejecuta `pip install -r requirements.txt`.
 
-## 👨‍💻 Autor
-* Andres Felipe Figueroa
+##  Autor
+* Andres Felipe Figueroa R
