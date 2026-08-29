@@ -1,0 +1,92 @@
+{% extends "app_base.html" %}
+{% block title %}Categorías | Portal de atención al cliente{% endblock %}
+{% block page_title %}Categorías{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Catálogo</p>
+      <h2 class="section-title">Crear categoría</h2>
+    </div>
+  </div>
+  <form method="post" class="stack">
+    {{ csrf_field() }}
+    <input type="hidden" name="action" value="create">
+    <div class="form-grid">
+      <div class="field">
+        <label for="name">Nombre</label>
+        <input id="name" name="name" type="text" required>
+      </div>
+      <div class="field">
+        <label for="description">Descripción</label>
+        <input id="description" name="description" type="text" required>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label class="pill" style="gap: 10px;">
+          <input type="checkbox" name="active" checked>
+          Categoría activa
+        </label>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" type="submit">Crear categoría</button>
+      </div>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Inventario</p>
+      <h2 class="section-title">Categorías registradas</h2>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="table mini-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for category in categories %}
+          <tr>
+            <td>
+              <form id="category-form-{{ category.id }}" method="post" action="{{ url_for('admin_category_update', category_id=category.id) }}">
+                {{ csrf_field() }}
+                <input type="hidden" name="action" value="update">
+              </form>
+              <input form="category-form-{{ category.id }}" name="name" type="text" value="{{ category.name }}" required>
+            </td>
+            <td>
+              <input form="category-form-{{ category.id }}" name="description" type="text" value="{{ category.description }}" required>
+            </td>
+            <td>
+              <label class="pill" style="gap: 10px;">
+                <input form="category-form-{{ category.id }}" type="checkbox" name="active" {% if category.active %}checked{% endif %}>
+                Activa
+              </label>
+            </td>
+            <td>
+              <div class="actions-row">
+                <button form="category-form-{{ category.id }}" class="btn btn-primary" type="submit">Guardar</button>
+                <form method="post" action="{{ url_for('admin_category_update', category_id=category.id) }}" class="inline-form">
+                  {{ csrf_field() }}
+                  <input type="hidden" name="action" value="delete">
+                  <button class="btn btn-danger" type="submit" data-confirm="¿Eliminar esta categoría? Solo se permitirá si no tiene solicitudes asociadas.">Eliminar</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "public_base.html" %}
+{% block title %}Acceso | Portal de atención al cliente{% endblock %}
+{% block content %}
+<section class="hero-grid">
+  <div class="hero-copy">
+    <p class="eyebrow">Portal web de atención al cliente</p>
+    <h1>Centraliza solicitudes, respuestas y reportes en un solo lugar.</h1>
+    <p>
+      Diseñado para registrar tickets 24/7, dar seguimiento por estados, adjuntar evidencias,
+      coordinar al equipo y producir reportes mensuales listos para la administración.
+    </p>
+    <div class="actions-row">
+      <a class="btn btn-primary" href="{{ url_for('register') }}">Crear cuenta de cliente</a>
+      <a class="btn btn-ghost" href="{{ url_for('login') }}">Ingresar al portal</a>
+    </div>
+    <div class="feature-list">
+      {% for item in features %}
+        <div class="feature-item">{{ item }}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="hero-card auth-card">
+    <div>
+      <p class="eyebrow">Inicio de sesión</p>
+      <h2>Entra con tu correo y contraseña.</h2>
+      <p class="auth-note">Usa las credenciales de prueba para explorar el sistema de inmediato.</p>
+    </div>
+
+    <form method="post" action="{{ url_for('login') }}" class="stack">
+      {{ csrf_field() }}
+      <div class="field">
+        <label for="email">Correo electrónico</label>
+        <input id="email" name="email" type="email" placeholder="nombre@correo.com" required>
+      </div>
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" placeholder="Tu contraseña" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Ingresar</button>
+    </form>
+
+    <div>
+      <p class="eyebrow">Cuentas demo</p>
+      <div class="credential-list">
+        {% for account in demo_accounts %}
+          <div class="credential-item">
+            <strong>{{ role_label(account.role_slug) }}: {{ account.first_name }}</strong>
+            <span>{{ account.email }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

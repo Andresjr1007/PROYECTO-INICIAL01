@@ -1,0 +1,147 @@
+{% extends "public_base.html" %}
+{% block title %}Propuesta IA | Portal de atención al cliente{% endblock %}
+{% block content %}
+<section class="proposal-grid">
+  <div class="proposal-hero">
+    <p class="eyebrow">Evolución del portal</p>
+    <h1>Propuesta de implementación de Inteligencia Artificial</h1>
+    <p>
+      Esta evolución plantea un módulo de IA que analice las solicitudes del portal, ayude a
+      clasificar y priorizar casos, sugiera respuestas útiles y entregue a la administración una
+      lectura más inteligente de la información acumulada.
+    </p>
+    <div class="proposal-badge-row">
+      <span class="proposal-chip">Clasificación automática</span>
+      <span class="proposal-chip">Priorización de casos</span>
+      <span class="proposal-chip">Resúmenes inteligentes</span>
+      <span class="proposal-chip">Recomendaciones</span>
+      <span class="proposal-chip">Chat de apoyo</span>
+      <span class="proposal-chip">RAG / base de conocimiento</span>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <article class="proposal-card">
+      <p class="eyebrow">1. Qué aporta</p>
+      <h2>Asistencia, no reemplazo</h2>
+      <p class="section-copy">
+        La IA funciona como una capa de apoyo para analizar texto, detectar patrones y ofrecer
+        sugerencias, mientras que las decisiones sensibles siguen bajo revisión humana.
+      </p>
+      <ul>
+        <li>Detecta si una solicitud parece urgente o repetitiva.</li>
+        <li>Resume solicitudes largas para ahorrar tiempo.</li>
+        <li>Propone una categoría, prioridad y posible solución.</li>
+        <li>Responde preguntas frecuentes apoyada en documentos oficiales.</li>
+      </ul>
+    </article>
+
+    <article class="proposal-card">
+      <p class="eyebrow">2. Arquitectura</p>
+      <h2>Portal + backend + servicio IA</h2>
+      <p class="section-copy">
+        La idea es desacoplar la inteligencia del núcleo transaccional para que pueda evolucionar sin
+        afectar el portal principal.
+      </p>
+      <div class="tag-list">
+        <span class="tag">Portal web</span>
+        <span class="tag">Backend API</span>
+        <span class="tag">Servicio IA</span>
+        <span class="tag">Base de datos</span>
+        <span class="tag">Conocimiento empresarial</span>
+      </div>
+      <ul>
+        <li>El portal registra la solicitud.</li>
+        <li>El backend envía el texto al servicio IA.</li>
+        <li>La IA clasifica, resume y recomienda.</li>
+        <li>El resultado se guarda y se muestra al usuario o empleado.</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="grid grid-2">
+    <article class="proposal-card">
+      <p class="eyebrow">3. Datos</p>
+      <h2>Extensión de la base de datos</h2>
+      <p class="section-copy">
+        Además de solicitudes y respuestas, el sistema puede guardar el resultado del análisis
+        automático para consultar desempeño, utilidad y aprendizaje histórico.
+      </p>
+      <ul>
+        <li><strong>analisis_ia</strong>: categoría sugerida, prioridad, sentimiento, resumen y recomendación.</li>
+        <li><strong>soluciones</strong>: solución aplicada, resultado y satisfacción del cliente.</li>
+        <li><strong>base de conocimiento</strong>: políticas, manuales, preguntas frecuentes y casos previos.</li>
+      </ul>
+    </article>
+
+    <article class="proposal-card">
+      <p class="eyebrow">4. Seguridad</p>
+      <h2>Human-in-the-loop</h2>
+      <p class="section-copy">
+        El módulo debe operar con supervisión, protección de datos y registro de auditoría para evitar
+        respuestas erróneas o decisiones automáticas en casos delicados.
+      </p>
+      <ul>
+        <li>Acceso restringido según rol.</li>
+        <li>Transmisión segura mediante HTTPS.</li>
+        <li>Anonimización cuando se usen métricas agregadas.</li>
+        <li>Validación humana antes de aplicar decisiones sensibles.</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="proposal-card">
+    <p class="eyebrow">5. Flujo sugerido</p>
+    <h2>De solicitud a recomendación</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-body">
+          <strong>Cliente registra la solicitud</strong>
+          <p>El portal almacena el caso y genera un número único de seguimiento.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-body">
+          <strong>IA analiza el texto</strong>
+          <p>Clasifica el tipo de caso, detecta urgencia y produce un resumen breve.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-body">
+          <strong>Empleado valida o ajusta</strong>
+          <p>La recomendación se revisa y el equipo decide la acción final.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <article class="proposal-card">
+      <p class="eyebrow">6. Beneficios</p>
+      <h2>Valor para la empresa</h2>
+      <ul>
+        <li>Respuestas más rápidas para clientes y empleados.</li>
+        <li>Identificación de problemas repetitivos y tendencias.</li>
+        <li>Reportes inteligentes con conclusiones accionables.</li>
+        <li>Menor carga operativa para el equipo de atención.</li>
+      </ul>
+    </article>
+    <article class="proposal-card">
+      <p class="eyebrow">7. Siguiente paso</p>
+      <h2>Integración gradual</h2>
+      <ul>
+        <li>Primero: registrar y priorizar automáticamente.</li>
+        <li>Después: base de conocimiento y chatbot.</li>
+        <li>Finalmente: análisis histórico, alertas y reportes inteligentes.</li>
+      </ul>
+      <div class="actions-row" style="margin-top: 18px;">
+        <a class="btn btn-primary" href="{{ url_for('index') }}">Volver al portal</a>
+        <a class="btn btn-ghost" href="{{ url_for('login') }}">Iniciar sesión</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

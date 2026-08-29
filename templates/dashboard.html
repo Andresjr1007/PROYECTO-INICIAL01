@@ -1,0 +1,158 @@
+{% extends "app_base.html" %}
+{% block title %}Dashboard | Portal de atención al cliente{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<section class="grid kpi-grid">
+  <article class="metric-card metric-accent">
+    <div class="metric-label">Solicitudes totales</div>
+    <div class="metric-value">{{ metrics.summary.total_tickets or 0 }}</div>
+    <div class="metric-note">Acumuladas en tu alcance de acceso.</div>
+  </article>
+  <article class="metric-card metric-cool">
+    <div class="metric-label">Abiertas</div>
+    <div class="metric-value">{{ metrics.summary.open_tickets or 0 }}</div>
+    <div class="metric-note">Aún requieren seguimiento.</div>
+  </article>
+  <article class="metric-card metric-green">
+    <div class="metric-label">Cerradas</div>
+    <div class="metric-value">{{ metrics.summary.closed_tickets or 0 }}</div>
+    <div class="metric-note">Casos resueltos y cerrados.</div>
+  </article>
+  <article class="metric-card metric-warm">
+    <div class="metric-label">Este mes</div>
+    <div class="metric-value">{{ metrics.summary.month_tickets or 0 }}</div>
+    <div class="metric-note">Solicitudes creadas en el mes actual.</div>
+  </article>
+  <article class="metric-card metric-rose">
+    <div class="metric-label">Tiempo promedio</div>
+    <div class="metric-value">{{ metrics.summary.avg_resolution_hours or 0 }} h</div>
+    <div class="metric-note">Entre apertura y cierre.</div>
+  </article>
+  <article class="metric-card metric-accent">
+    <div class="metric-label">Satisfacción</div>
+    <div class="metric-value">{{ metrics.summary.satisfaction_avg or 0 }} / 5</div>
+    <div class="metric-note">Valoración promedio registrada.</div>
+  </article>
+</section>
+
+<section class="grid split-grid">
+  <div class="card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Estado operacional</p>
+        <h2 class="section-title">Distribución por estado</h2>
+      </div>
+    </div>
+    {% if metrics.by_status %}
+      <div class="bar-list">
+        {% for item in metrics.by_status %}
+          <div class="bar-row">
+            <span>{{ status_label(item.status) }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: {{ ((item.total / status_max) * 100) if status_max else 0 }}%"></div>
+            </div>
+            <div class="bar-footer">
+              <span>Solicitudes</span>
+              <strong>{{ item.total }}</strong>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">Aún no hay solicitudes para mostrar.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Demanda</p>
+        <h2 class="section-title">Categorías más activas</h2>
+      </div>
+    </div>
+    {% if metrics.by_category %}
+      <div class="bar-list">
+        {% for item in metrics.by_category %}
+          <div class="bar-row">
+            <span>{{ item.name }}</span>
+            <div class="bar-track">
+              <div class="bar-fill warm" style="width: {{ ((item.total / category_max) * 100) if category_max else 0 }}%"></div>
+            </div>
+            <div class="bar-footer">
+              <span>Solicitudes</span>
+              <strong>{{ item.total }}</strong>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">No hay datos de categorías aún.</div>
+    {% endif %}
+  </div>
+</section>
+
+{% if metrics.by_employee %}
+<section class="card">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Carga operativa</p>
+      <h2 class="section-title">Solicitudes por empleado</h2>
+    </div>
+  </div>
+  <div class="bar-list">
+    {% for item in metrics.by_employee %}
+      <div class="bar-row">
+        <span>{{ item.name }}</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{ ((item.total / employee_max) * 100) if employee_max else 0 }}%"></div>
+        </div>
+        <div class="bar-footer">
+          <span>Solicitudes</span>
+          <strong>{{ item.total }}</strong>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="card">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Actividad reciente</p>
+      <h2 class="section-title">Últimas solicitudes actualizadas</h2>
+    </div>
+    <a class="btn btn-secondary" href="{{ url_for('tickets') }}">Ver todas</a>
+  </div>
+  {% if recent_tickets %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ticket</th>
+            <th>Asunto</th>
+            <th>Estado</th>
+            <th>Categoría</th>
+            <th>Cliente</th>
+            <th>Actualizado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in recent_tickets %}
+            <tr>
+              <td><a class="ticket-code" href="{{ url_for('ticket_detail', ticket_id=ticket.id) }}">{{ ticket.code }}</a></td>
+              <td>{{ ticket.subject }}</td>
+              <td><span class="badge {{ status_badge(ticket.status) }}">{{ status_label(ticket.status) }}</span></td>
+              <td>{{ ticket.category_name }}</td>
+              <td>{{ ticket.client_name }}</td>
+              <td>{{ format_datetime(ticket.updated_at) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">No hay solicitudes recientes.</div>
+  {% endif %}
+</section>
+{% endblock %}

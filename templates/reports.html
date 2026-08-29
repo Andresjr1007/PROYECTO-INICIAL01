@@ -1,0 +1,187 @@
+{% extends "app_base.html" %}
+{% block title %}Reportes | Portal de atención al cliente{% endblock %}
+{% block page_title %}Reportes{% endblock %}
+{% block content %}
+<section class="card">
+  <form method="get" class="report-toolbar">
+    <div class="field">
+      <label for="month">Mes</label>
+      <select id="month" name="month">
+        {% for month_num in range(1, 13) %}
+          <option value="{{ month_num }}" {% if month_num == report.month %}selected{% endif %}>{{ month_label_es(report.year, month_num).split(' ')[0] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="year">Año</label>
+      <input id="year" name="year" type="number" min="2020" max="2100" value="{{ report.year }}">
+    </div>
+    <div class="field">
+      <label>&nbsp;</label>
+      <button class="btn btn-primary" type="submit">Actualizar</button>
+    </div>
+    <div class="field">
+      <label>&nbsp;</label>
+      <div class="actions-row">
+        <a class="btn btn-secondary" href="{{ url_for('reports_export', fmt='pdf', year=report.year, month=report.month) }}">Descargar PDF</a>
+        <a class="btn btn-ghost" href="{{ url_for('reports_export', fmt='xlsx', year=report.year, month=report.month) }}">Descargar Excel</a>
+      </div>
+    </div>
+  </form>
+</section>
+
+<section class="grid kpi-grid">
+  <article class="metric-card metric-accent">
+    <div class="metric-label">Total solicitudes</div>
+    <div class="metric-value">{{ report.summary.total_tickets or 0 }}</div>
+    <div class="metric-note">{{ report.label }}</div>
+  </article>
+  <article class="metric-card metric-green">
+    <div class="metric-label">Cerradas</div>
+    <div class="metric-value">{{ report.summary.closed_tickets or 0 }}</div>
+    <div class="metric-note">Casos resueltos durante el período.</div>
+  </article>
+  <article class="metric-card metric-warm">
+    <div class="metric-label">Abiertas</div>
+    <div class="metric-value">{{ report.summary.open_tickets or 0 }}</div>
+    <div class="metric-note">Pendientes de atención o cierre.</div>
+  </article>
+  <article class="metric-card metric-cool">
+    <div class="metric-label">Pendientes del cliente</div>
+    <div class="metric-value">{{ report.summary.pending_client or 0 }}</div>
+    <div class="metric-note">Esperando respuesta del usuario.</div>
+  </article>
+  <article class="metric-card metric-rose">
+    <div class="metric-label">Promedio atención</div>
+    <div class="metric-value">{{ report.summary.avg_resolution_hours or 0 }} h</div>
+    <div class="metric-note">Tiempo medio entre apertura y cierre.</div>
+  </article>
+  <article class="metric-card metric-accent">
+    <div class="metric-label">Satisfacción</div>
+    <div class="metric-value">{{ report.summary.satisfaction_avg or 0 }} / 5</div>
+    <div class="metric-note">Promedio de valoración del período.</div>
+  </article>
+</section>
+
+<section class="grid split-grid">
+  <div class="card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Estadística</p>
+        <h2 class="section-title">Distribución por estado</h2>
+      </div>
+    </div>
+    {% if report.by_status %}
+      <div class="bar-list">
+        {% for item in report.by_status %}
+          <div class="bar-row">
+            <span>{{ status_label(item.status) }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: {{ ((item.total / status_max) * 100) if status_max else 0 }}%"></div>
+            </div>
+            <div class="bar-footer">
+              <span>Solicitudes</span>
+              <strong>{{ item.total }}</strong>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">Sin datos para este mes.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Categorías</p>
+        <h2 class="section-title">Frecuencia por tipo</h2>
+      </div>
+    </div>
+    {% if report.by_category %}
+      <div class="bar-list">
+        {% for item in report.by_category %}
+          <div class="bar-row">
+            <span>{{ item.name }}</span>
+            <div class="bar-track">
+              <div class="bar-fill warm" style="width: {{ ((item.total / category_max) * 100) if category_max else 0 }}%"></div>
+            </div>
+            <div class="bar-footer">
+              <span>Solicitudes</span>
+              <strong>{{ item.total }}</strong>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">Sin datos para este mes.</div>
+    {% endif %}
+  </div>
+</section>
+
+{% if report.by_employee %}
+<section class="card">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Carga</p>
+      <h2 class="section-title">Solicitudes por empleado</h2>
+    </div>
+  </div>
+  <div class="bar-list">
+    {% for item in report.by_employee %}
+      <div class="bar-row">
+        <span>{{ item.name }}</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{ ((item.total / employee_max) * 100) if employee_max else 0 }}%"></div>
+        </div>
+        <div class="bar-footer">
+          <span>Solicitudes</span>
+          <strong>{{ item.total }}</strong>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="card">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Detalle</p>
+      <h2 class="section-title">Solicitudes del período</h2>
+    </div>
+  </div>
+  {% if report.tickets %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ticket</th>
+            <th>Cliente</th>
+            <th>Asunto</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Categoría</th>
+            <th>Actualizado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in report.tickets %}
+            <tr>
+              <td><a class="ticket-code" href="{{ url_for('ticket_detail', ticket_id=ticket.id) }}">{{ ticket.code }}</a></td>
+              <td>{{ ticket.client_name }}</td>
+              <td>{{ ticket.subject }}</td>
+              <td><span class="badge {{ status_badge(ticket.status) }}">{{ status_label(ticket.status) }}</span></td>
+              <td><span class="badge priority-{{ ticket.priority }}">{{ priority_label(ticket.priority) }}</span></td>
+              <td>{{ ticket.category_name }}</td>
+              <td>{{ format_datetime(ticket.updated_at) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">No hay solicitudes registradas para este período.</div>
+  {% endif %}
+</section>
+{% endblock %}
