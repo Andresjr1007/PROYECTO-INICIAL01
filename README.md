@@ -1,47 +1,17 @@
-# Portal de atención al cliente
+# PROYECTO-INICIAL01
 
-**Creador del proyecto:** Andres Felipe Figueroa
+Sistema web de atención al cliente desarrollado como proyecto académico.
 
-Aplicación web funcional para registrar, asignar, responder y cerrar solicitudes de clientes.
+## 📚 Fase 00: Documentación del Ciclo de Vida
+* [ERS - Especificación de Requerimientos de Software](docs/requerimientos/ERS.md)
+* [Visión y Alcance](docs/requerimientos/Vision_y_Alcance.md)
+* [Historias de Usuario](docs/requerimientos/Historias_de_Usuario.md)
+* [Casos de Uso](docs/requerimientos/Casos_de_Uso.md)
+* [Matriz de Trazabilidad](docs/requerimientos/Matriz_de_Trazabilidad.md)
 
-## Qué incluye
+## 🚀 Instalación y Ejecución
+* Para ejecutar el portal, usa el archivo `run.ps1` en Windows.
+* Requisitos: Python instalado. Para instalar dependencias, ejecuta `pip install -r requirements.txt`.
 
-- Registro de clientes y autenticación por roles.
-- Flujo de tickets con estados, historial y comentarios.
-- Adjuntos para solicitudes.
-- Panel de administración con usuarios y categorías.
-- Dashboard con KPI.
-- Reportes mensuales en PDF y Excel.
-- Página adicional con la propuesta de implementación de Inteligencia Artificial.
-
-## Credenciales demo
-
-- Administrador: `admin@portal.local` / `Admin123!`
-- Empleado: `agente@portal.local` / `Agente123!`
-- Cliente: `cliente@portal.local` / `Cliente123!`
-
-## Cómo ejecutar
-
-1. Abre una terminal en `C:\Users\andre\source\repos\portal-atencion-cliente`.
-2. Ejecuta:
-
-```powershell
-& 'C:\Users\andre\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' app.py
-```
-
-3. Abre `http://127.0.0.1:5000`.
-
-## Persistencia
-
-- La aplicación usa SQLite local en `data\portal.db` para quedar operativa sin configuración adicional.
-- El modelo está pensado para migrarse a PostgreSQL y se incluye un esquema de referencia en `schema_postgresql.sql`.
-
-## Exportaciones
-
-- Los reportes mensuales se descargan en PDF y Excel desde la sección de administración.
-
-## Propuesta IA
-
-La evolución del portal incluye una sección pública en `/propuesta-ia` donde se resume la propuesta
-de Inteligencia Artificial: clasificación automática, priorización, resúmenes, recomendaciones,
-chat de apoyo y análisis histórico con supervisión humana.
+## 👨‍💻 Autor
+* Andres Felipe Figueroa
