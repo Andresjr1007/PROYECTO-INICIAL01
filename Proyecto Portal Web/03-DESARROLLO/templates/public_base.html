@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Portal de atención al cliente{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="public-page">
+  <div class="page-noise"></div>
+  <div class="public-shell">
+    <header class="public-header">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-mark">24/7</span>
+        <span>
+          <strong>Atención Cliente</strong>
+          <small>Portal web centralizado</small>
+        </span>
+      </a>
+      <nav class="public-nav">
+        <a href="{{ url_for('ai_proposal') }}">Propuesta IA</a>
+        <a href="{{ url_for('login') }}">Ingresar</a>
+        <a class="btn btn-secondary" href="{{ url_for('register') }}">Crear cuenta</a>
+      </nav>
+    </header>
+    {% include "_flashes.html" %}
+    {% block content %}{% endblock %}
+    <footer class="site-footer">
+      <span>Creador: {{ project_creator }}</span>
+      <a href="{{ url_for('ai_proposal') }}">Ver propuesta de IA</a>
+    </footer>
+  </div>
+</body>
+</html>

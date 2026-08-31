@@ -1,0 +1,254 @@
+{% extends "app_base.html" %}
+{% block title %}{{ ticket.code }} | Portal de atención al cliente{% endblock %}
+{% block page_title %}{{ ticket.code }}{% endblock %}
+{% block content %}
+<section class="detail-grid">
+  <div class="detail-main">
+    <article class="card">
+      <div class="ticket-head">
+        <div>
+          <div class="ticket-meta">
+            <span class="ticket-code">{{ ticket.code }}</span>
+            <span class="badge {{ status_badge(ticket.status) }}">{{ status_label(ticket.status) }}</span>
+            <span class="badge priority-{{ ticket.priority }}">{{ priority_label(ticket.priority) }}</span>
+          </div>
+          <h2>{{ ticket.subject }}</h2>
+          <p class="ticket-description">{{ ticket.description }}</p>
+        </div>
+        <div class="stack" style="min-width: 240px;">
+          <div class="pill-row">
+            <span class="pill">{{ ticket.category_name }}</span>
+            <span class="pill">{{ ticket.client_name }}</span>
+          </div>
+          <div class="pill-row">
+            <span class="pill pill-soft">Creado: {{ format_datetime(ticket.created_at) }}</span>
+            <span class="pill pill-soft">Actualizado: {{ format_datetime(ticket.updated_at) }}</span>
+          </div>
+          <div class="pill-row">
+            <span class="pill pill-soft">Asignado: {{ ticket.employee_name or 'Sin asignar' }}</span>
+            <span class="pill pill-soft">Respuestas: {{ ticket.response_count }}</span>
+          </div>
+          {% if average_hours is not none %}
+            <span class="pill pill-soft">Tiempo medio: {{ average_hours }} h</span>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+
+    <div class="grid">
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Conversación</p>
+            <h2 class="section-title">Respuestas</h2>
+          </div>
+        </div>
+        <div class="timeline">
+          {% for response in responses %}
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-body">
+                <strong>{{ response.author_name }} · {{ role_label(response.author_role) }}</strong>
+                <small>{{ format_datetime(response.created_at) }}</small>
+                <p>{{ response.body }}</p>
+              </div>
+            </div>
+          {% else %}
+            <div class="empty-state">Aún no hay respuestas registradas.</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Auditoría</p>
+            <h2 class="section-title">Historial de cambios</h2>
+          </div>
+        </div>
+        <div class="timeline">
+          {% for item in history %}
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-body">
+                <strong>
+                  {{ item.action.replace('_', ' ') | title }}
+                  {% if item.actor_name %} · {{ item.actor_name }}{% endif %}
+                </strong>
+                <small>{{ format_datetime(item.created_at) }}</small>
+                <p>
+                  {% if item.from_status or item.to_status %}
+                    {{ status_label(item.from_status) }} → {{ status_label(item.to_status) }}
+                  {% endif %}
+                  {% if item.note %}
+                    {{ item.note }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          {% else %}
+            <div class="empty-state">Todavía no se han registrado cambios de estado.</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Evidencias</p>
+            <h2 class="section-title">Adjuntos</h2>
+          </div>
+        </div>
+        {% if attachments %}
+          <div class="attachment-list">
+            {% for attachment in attachments %}
+              <a class="attachment-item" href="{{ url_for('ticket_attachment', ticket_id=ticket.id, attachment_id=attachment.id) }}">
+                <div>
+                  <strong>{{ attachment.original_name }}</strong>
+                  <small>{{ attachment.author_name }} · {{ format_datetime(attachment.created_at) }}</small>
+                </div>
+                <span class="btn btn-ghost">Descargar</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">No hay archivos adjuntos en esta solicitud.</div>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+
+  <aside class="detail-aside">
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Responder</p>
+          <h2 class="section-title">Agregar comentario</h2>
+        </div>
+      </div>
+      <form method="post" action="{{ url_for('ticket_action', ticket_id=ticket.id) }}" class="stack">
+        {{ csrf_field() }}
+        <input type="hidden" name="action" value="respond">
+        <div class="field">
+          <label for="body">Mensaje</label>
+          <textarea id="body" name="body" placeholder="Escribe una respuesta, observación o instrucción." required></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Enviar respuesta</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Gestión</p>
+          <h2 class="section-title">Estado y asignación</h2>
+        </div>
+      </div>
+
+      {% if can_claim %}
+        <form method="post" action="{{ url_for('ticket_action', ticket_id=ticket.id) }}" class="stack">
+          {{ csrf_field() }}
+          <input type="hidden" name="action" value="claim">
+          <button class="btn btn-secondary" type="submit">Tomar solicitud</button>
+        </form>
+      {% endif %}
+
+      {% if current_user.role_slug == 'admin' %}
+        <form method="post" action="{{ url_for('ticket_action', ticket_id=ticket.id) }}" class="stack">
+          {{ csrf_field() }}
+          <input type="hidden" name="action" value="assign">
+          <div class="field">
+            <label for="employee_id">Asignar empleado</label>
+            <select id="employee_id" name="employee_id" required>
+              <option value="">Selecciona</option>
+              {% for employee in employees %}
+                <option value="{{ employee.id }}" {% if ticket.assigned_to == employee.id %}selected{% endif %}>{{ employee.first_name }} {{ employee.last_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="btn btn-primary" type="submit">Asignar</button>
+        </form>
+      {% endif %}
+
+      {% if current_user.role_slug != 'client' %}
+        <form method="post" action="{{ url_for('ticket_action', ticket_id=ticket.id) }}" class="stack">
+          {{ csrf_field() }}
+          <input type="hidden" name="action" value="status">
+          <div class="field">
+            <label for="new_status">Cambiar estado</label>
+            <select id="new_status" name="new_status" required>
+              {% for value, label in status_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="note">Observación</label>
+            <textarea id="note" name="note" placeholder="Opcional"></textarea>
+          </div>
+          <button class="btn btn-secondary" type="submit">Actualizar estado</button>
+        </form>
+      {% endif %}
+    </section>
+
+    {% if can_close %}
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Cierre</p>
+            <h2 class="section-title">Cerrar y valorar</h2>
+          </div>
+        </div>
+        <form method="post" action="{{ url_for('ticket_action', ticket_id=ticket.id) }}" class="stack">
+          {{ csrf_field() }}
+          <input type="hidden" name="action" value="status">
+          <input type="hidden" name="new_status" value="closed">
+          <div class="field">
+            <label for="satisfaction_rating">Satisfacción</label>
+            <select id="satisfaction_rating" name="satisfaction_rating" required>
+              <option value="">Selecciona una calificación</option>
+              {% for i in range(5, 0, -1) %}
+                <option value="{{ i }}">{{ i }} estrellas</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="satisfaction_comment">Comentario final</label>
+            <textarea id="satisfaction_comment" name="satisfaction_comment" placeholder="¿Cómo fue tu experiencia?"></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Cerrar solicitud</button>
+        </form>
+      </section>
+    {% endif %}
+
+    {% if current_user.role_slug == 'client' and ticket.status == 'closed' %}
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Valoración</p>
+            <h2 class="section-title">Actualizar satisfacción</h2>
+          </div>
+        </div>
+        <form method="post" action="{{ url_for('ticket_action', ticket_id=ticket.id) }}" class="stack">
+          {{ csrf_field() }}
+          <input type="hidden" name="action" value="rate">
+          <div class="field">
+            <label for="satisfaction_rating_live">Calificación</label>
+            <select id="satisfaction_rating_live" name="satisfaction_rating" required>
+              <option value="">Selecciona</option>
+              {% for i in range(5, 0, -1) %}
+                <option value="{{ i }}">{{ i }} estrellas</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="satisfaction_comment_live">Comentario</label>
+            <textarea id="satisfaction_comment_live" name="satisfaction_comment" placeholder="Comparte tu experiencia"></textarea>
+          </div>
+          <button class="btn btn-secondary" type="submit">Guardar valoración</button>
+        </form>
+      </section>
+    {% endif %}
+  </aside>
+</section>
+{% endblock %}
